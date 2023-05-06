@@ -1,25 +1,43 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component, OnInit } from '@angular/core';
+import { Router, NavigationExtras } from '@angular/router';
+import {AppServiceService} from '../../app-service.service';
 
-import { EditStudentComponent } from './edit-student.component';
+@Component({
+  selector: 'app-edit-student',
+  templateUrl: './edit-student.component.html',
+  styleUrls: ['./edit-student.component.css']
+})
+export class EditStudentComponent implements OnInit {
 
-describe('EditStudentComponent', () => {
-  let component: EditStudentComponent;
-  let fixture: ComponentFixture<EditStudentComponent>;
+  studentData: any;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ EditStudentComponent ]
+
+  constructor(private service : AppServiceService, private router: Router) { }
+
+  navigation = this.router.getCurrentNavigation();
+
+  ngOnInit(): void {
+    this.getStudentData();
+  }
+
+  getStudentData(){
+    let student = {
+      id : this.navigation.extras.state.id
+    }
+    this.service.getOneStudentData(student).subscribe((response)=>{
+      this.studentData = response[0];
+    },(error)=>{
+      console.log('ERROR - ', error)
     })
-    .compileComponents();
-  }));
+  }
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(EditStudentComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+  editStudent(values){
+    values.id = this.navigation.extras.state.id;
+    this.service.editStudent(values).subscribe((response)=>{
+      this.studentData = response[0];
+    },(error)=>{
+      console.log('ERROR - ', error)
+    })
+  }
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+}
